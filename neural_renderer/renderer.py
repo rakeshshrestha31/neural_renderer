@@ -111,7 +111,10 @@ class Renderer(nn.Module):
 
         # rasterization
         faces = nr.vertices_to_faces(vertices, faces)
-        images = nr.rasterize_silhouettes(faces, self.image_size, self.anti_aliasing)
+        images = nr.rasterize_silhouettes(
+            faces, self.image_size, self.anti_aliasing,
+            self.near, self.far, self.rasterizer_eps
+        )
         return images
 
     def render_depth(self, vertices, faces, K=None, R=None, t=None, dist_coeffs=None, orig_size=None):
@@ -146,7 +149,10 @@ class Renderer(nn.Module):
 
         # rasterization
         faces = nr.vertices_to_faces(vertices, faces)
-        images = nr.rasterize_depth(faces, self.image_size, self.anti_aliasing)
+        images = nr.rasterize_depth(
+            faces, self.image_size, self.anti_aliasing,
+            self.near, self.far, self.rasterizer_eps
+        )
         return images
 
     def render_rgb(self, vertices, faces, textures, K=None, R=None, t=None, dist_coeffs=None, orig_size=None):
