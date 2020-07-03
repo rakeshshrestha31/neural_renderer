@@ -30,8 +30,16 @@ def projection(vertices, K, R, t, dist_coeffs, orig_size, eps=1e-9):
 
     # we use x_ for x' and x__ for x'' etc.
     r = torch.sqrt(x_ ** 2 + y_ ** 2)
-    x__ = x_*(1 + k1*(r**2) + k2*(r**4) + k3*(r**6)) + 2*p1*x_*y_ + p2*(r**2 + 2*x_**2)
-    y__ = y_*(1 + k1*(r**2) + k2*(r**4) + k3 *(r**6)) + p1*(r**2 + 2*y_**2) + 2*p2*x_*y_
+    # x__ = x_*(1 + k1*(r**2) + k2*(r**4) + k3*(r**6)) + 2*p1*x_*y_ + p2*(r**2 + 2*x_**2)
+    # y__ = y_*(1 + k1*(r**2) + k2*(r**4) + k3 *(r**6)) + p1*(r**2 + 2*y_**2) + 2*p2*x_*y_
+
+    x__ = x_
+    y__ = y_
+    if torch.any(k1 != 0) or torch.any(k2 != 0) or torch.any(p1 != 0) \
+            or torch.any(p2 != 0) or torch.any(k3 != 0):
+        x__ *= (1 + k1*(r**2) + k2*(r**4) + k3*(r**6)) + 2*p1*x_*y_ + p2*(r**2 + 2*x_**2)
+        y__ *= (1 + k1*(r**2) + k2*(r**4) + k3 *(r**6)) + p1*(r**2 + 2*y_**2) + 2*p2*x_*y_
+
     vertices = torch.stack([x__, y__, torch.ones_like(z)], dim=-1)
     vertices = torch.matmul(vertices, K.transpose(1,2))
     u, v = vertices[:, :, 0], vertices[:, :, 1]
